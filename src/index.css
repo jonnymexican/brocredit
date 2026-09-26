@@ -544,6 +544,32 @@ body {
 
 .danger-title { color: #f2766b; }
 
+/* Records office (backup/restore) */
+.records-office {
+  margin-top: 1.4rem;
+  border: 1px dashed #4a3527;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.backup-restore {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+}
+
+.backup-status {
+  flex-basis: 100%;
+  margin: 0.4rem 0 0;
+  font-size: 0.86rem;
+  color: #7fce7f;
+}
+
+.backup-status-error {
+  color: #f2766b;
+}
+
 .app-footer {
   margin-top: 3rem;
   text-align: center;

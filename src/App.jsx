@@ -7,6 +7,7 @@ import Standings from './components/Standings.jsx';
 import TransactionLog from './components/TransactionLog.jsx';
 import Stats from './components/Stats.jsx';
 import Roster from './components/Roster.jsx';
+import BackupRestore from './components/BackupRestore.jsx';
 
 const VIEWS = [
   { id: 'standings', label: 'Standings' },
@@ -98,6 +99,15 @@ export default function App() {
               <button type="button" className="btn-danger" onClick={ledger.clearAll}>
                 Dissolve the Bureau
               </button>
+            </section>
+
+            <section className="records-office" aria-label="Records office">
+              <h2 className="section-title">Records office</h2>
+              <p className="hint-line">
+                Download the ledgers as a file, or restore them from a previous export. Records
+                stay on this device — keep a copy somewhere safe.
+              </p>
+              <BackupRestore />
             </section>
           </>
         )}
