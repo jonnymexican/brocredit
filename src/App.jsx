@@ -66,6 +66,7 @@ export default function App() {
               onFile={ledger.fileTransaction}
               undoAvailable={ledger.undoAvailable}
               onUndo={ledger.undoLast}
+              onAddFriend={ledger.addFriend}
             />
             <Standings rows={scores} />
           </>

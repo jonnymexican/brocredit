@@ -68,6 +68,10 @@ export default function useLedger() {
   migrateStorage();
 
   const [friends, setFriends] = useState(() => loadList(FRIENDS_KEY));
+  const friendsRef = useRef(friends);
+  useEffect(() => {
+    friendsRef.current = friends;
+  }, [friends]);
   const [transactions, setTransactions] = useState(() =>
     migrateTransactions(loadList(TXNS_KEY))
   );
@@ -77,9 +81,16 @@ export default function useLedger() {
   useEffect(() => persist(FRIENDS_KEY, friends), [friends]);
   useEffect(() => persist(TXNS_KEY, transactions), [transactions]);
 
+  /**
+   * Returns false when the name is blank or already taken (so callers can
+   * show an inline error), true when a citizen was registered.
+   */
   const addFriend = useCallback((name) => {
     const trimmed = (name || '').trim();
     if (!trimmed) return false;
+    if (friendsRef.current.some((f) => f.name.toLowerCase() === trimmed.toLowerCase())) {
+      return false;
+    }
     setFriends((current) =>
       current.some((f) => f.name.toLowerCase() === trimmed.toLowerCase())
         ? current

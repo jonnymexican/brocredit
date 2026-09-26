@@ -112,6 +112,36 @@ body {
 .delta-plus { color: #7fce7f; }
 .delta-minus { color: #f2766b; }
 
+/* Inline add-friend form */
+.add-friend-form {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.6rem;
+}
+
+.add-friend-form .form-input {
+  flex: 1;
+  min-width: 9rem;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.88rem;
+}
+
+.add-friend-form .btn-secondary {
+  padding: 0.4rem 0.85rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.add-friend-form .form-error {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+.add-friend-form.compact {
+  max-width: 26rem;
+}
+
 /* Award form */
 .award-form {
   background: #221812;
