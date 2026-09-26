@@ -6,10 +6,10 @@ function categoryLabel(id) {
   return cat ? cat.label : 'Unlisted conduct';
 }
 
-export default function TransactionLog({ transactions, guys, onDelete }) {
+export default function TransactionLog({ transactions, friends, onDelete }) {
   const [filter, setFilter] = React.useState('all');
 
-  const nameOf = (guyId) => guys.find((g) => g.id === guyId)?.name || 'Unknown guy';
+  const nameOf = (friendId) => friends.find((f) => f.id === friendId)?.name || 'Unknown friend';
 
   const sorted = React.useMemo(
     () =>
@@ -54,7 +54,7 @@ export default function TransactionLog({ transactions, guys, onDelete }) {
               </span>
               <div className="txn-body">
                 <div className="txn-headline">
-                  <strong>{nameOf(t.guyId)}</strong> — {categoryLabel(t.categoryId)}
+                  <strong>{nameOf(t.friendId)}</strong> — {categoryLabel(t.categoryId)}
                 </div>
                 {t.note && <div className="txn-note">“{t.note}”</div>}
                 <div className="txn-date">{prettyDate(t.date)}</div>
@@ -63,7 +63,7 @@ export default function TransactionLog({ transactions, guys, onDelete }) {
                 <button
                   type="button"
                   className="btn-icon"
-                  aria-label={`Redact filing for ${nameOf(t.guyId)}`}
+                  aria-label={`Redact filing for ${nameOf(t.friendId)}`}
                   onClick={() => onDelete(t.id)}
                 >
                   🗑️

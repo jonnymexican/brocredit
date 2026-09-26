@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "BroCredit™ — the Bureau of Guy Conduct: a tongue-in-cheek credit system for the guys",
+  "description": "FriendCredit™ — the Bureau of Friend Conduct: a tongue-in-cheek credit system for any friend group",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

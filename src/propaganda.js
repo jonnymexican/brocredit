@@ -1,4 +1,4 @@
-// Official Bureau of Guy Conduct propaganda lines. One is displayed at a
+// Official Bureau of Friend Conduct propaganda lines. One is displayed at a
 // time; the footer rotates through them.
 export const PROPAGANDA = [
   'Your conduct has been noted.',
@@ -9,10 +9,10 @@ export const PROPAGANDA = [
   'Report your friends. It is what they would want.',
   'Obedience brings snacks. Snacks bring honor.',
   'The aux cord belongs to the worthy.',
-  'Denial of the bill split is denial of the Guys.',
+  'Denial of the bill split is denial of the friend group.',
   'Big score energy is earned, never given.',
   'Celebrate responsibly. The Bureau is watching the group chat.',
-  'Helping a guy move: the highest form of devotion.',
+  'Helping a friend move: the highest form of devotion.',
 ];
 
 export function randomSlogan(exclude) {

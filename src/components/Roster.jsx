@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-export default function Roster({ guys, scores, onAdd, onRename, onRemove }) {
+export default function Roster({ friends, scores, onAdd, onRename, onRemove }) {
   const [newName, setNewName] = React.useState('');
   const [editingId, setEditingId] = React.useState(null);
   const [editName, setEditName] = React.useState('');
@@ -9,7 +9,7 @@ export default function Roster({ guys, scores, onAdd, onRename, onRemove }) {
     e.preventDefault();
     const trimmed = newName.trim();
     if (!trimmed) return;
-    if (guys.some((g) => g.name.toLowerCase() === trimmed.toLowerCase())) {
+    if (friends.some((f) => f.name.toLowerCase() === trimmed.toLowerCase())) {
       setNewName('');
       return;
     }
@@ -17,9 +17,9 @@ export default function Roster({ guys, scores, onAdd, onRename, onRemove }) {
     setNewName('');
   };
 
-  const scoreFor = (id) => scores.find((s) => s.guy.id === id);
-  const nameTaken = guys.some(
-    (g) => g.name.toLowerCase() === newName.trim().toLowerCase()
+  const scoreFor = (id) => scores.find((s) => s.friend.id === id);
+  const nameTaken = friends.some(
+    (f) => f.name.toLowerCase() === newName.trim().toLowerCase()
   ) && newName.trim() !== '';
 
   return (
@@ -33,8 +33,8 @@ export default function Roster({ guys, scores, onAdd, onRename, onRemove }) {
         <input
           className="form-input"
           type="text"
-          placeholder="Name of the guy"
-          aria-label="Name of the guy"
+          placeholder="Name of the friend"
+          aria-label="Name of the friend"
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
         />
@@ -46,15 +46,15 @@ export default function Roster({ guys, scores, onAdd, onRename, onRemove }) {
         <p className="form-error" role="alert">A citizen by that name already exists.</p>
       )}
 
-      {guys.length === 0 ? (
+      {friends.length === 0 ? (
         <p className="empty-state">No citizens registered yet. Every republic starts somewhere.</p>
       ) : (
         <ul className="roster-list">
-          {guys.map((g) => {
-            const s = scoreFor(g.id);
-            const isEditing = editingId === g.id;
+          {friends.map((f) => {
+            const s = scoreFor(f.id);
+            const isEditing = editingId === f.id;
             return (
-              <li key={g.id} className="roster-row">
+              <li key={f.id} className="roster-row">
                 {isEditing ? (
                   <>
                     <input
@@ -67,7 +67,7 @@ export default function Roster({ guys, scores, onAdd, onRename, onRemove }) {
                       type="button"
                       className="btn-primary btn-small"
                       onClick={() => {
-                        onRename(g.id, editName);
+                        onRename(f.id, editName);
                         setEditingId(null);
                       }}
                       disabled={!editName.trim()}
@@ -84,7 +84,7 @@ export default function Roster({ guys, scores, onAdd, onRename, onRemove }) {
                   </>
                 ) : (
                   <>
-                    <span className="roster-name">{g.name}</span>
+                    <span className="roster-name">{f.name}</span>
                     <span className="roster-meta">
                       {s ? s.score + ' pts · ' + s.txnCount + ' filings' : ''}
                     </span>
@@ -92,8 +92,8 @@ export default function Roster({ guys, scores, onAdd, onRename, onRemove }) {
                       type="button"
                       className="btn-secondary btn-small"
                       onClick={() => {
-                        setEditingId(g.id);
-                        setEditName(g.name);
+                        setEditingId(f.id);
+                        setEditName(f.name);
                       }}
                     >
                       Rename
@@ -102,8 +102,8 @@ export default function Roster({ guys, scores, onAdd, onRename, onRemove }) {
                       type="button"
                       className="btn-danger btn-small"
                       onClick={() => {
-                        if (window.confirm('Expel ' + g.name + ' and redact all their records?')) {
-                          onRemove(g.id);
+                        if (window.confirm('Expel ' + f.name + ' and redact all their records?')) {
+                          onRemove(f.id);
                         }
                       }}
                     >

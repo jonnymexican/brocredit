@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { CREDIT_CATEGORIES, CUSTOM_CATEGORY_ID, clampDelta, todayStr } from '../ledgerLogic.js';
 
-export default function AwardPanel({ guys, onFile, undoAvailable, onUndo }) {
-  const [guyId, setGuyId] = React.useState('');
+export default function AwardPanel({ friends, onFile, undoAvailable, onUndo }) {
+  const [friendId, setFriendId] = React.useState('');
   const [categoryId, setCategoryId] = React.useState('');
   const [customDelta, setCustomDelta] = React.useState('');
   const [note, setNote] = React.useState('');
@@ -19,17 +19,17 @@ export default function AwardPanel({ guys, onFile, undoAvailable, onUndo }) {
       ? selected.delta
       : null;
 
-  const canSubmit = Boolean(guyId && selected && (isCustom ? Number.isFinite(effectiveDelta) && customDelta.trim() !== '' : true));
+  const canSubmit = Boolean(friendId && selected && (isCustom ? Number.isFinite(effectiveDelta) && customDelta.trim() !== '' : true));
 
   const submit = (e) => {
     e.preventDefault();
     if (!canSubmit) {
-      if (!guyId) setError('Select a citizen of the guy-republic.');
+      if (!friendId) setError('Select a citizen of the friend-republic.');
       else if (!selected) setError('Select an offense or honor.');
       else setError('Enter a custom point value between -100 and 100.');
       return;
     }
-    const ok = onFile({ guyId, categoryId, delta: effectiveDelta, note, date });
+    const ok = onFile({ friendId, categoryId, delta: effectiveDelta, note, date });
     if (ok) {
       setCategoryId('');
       setCustomDelta('');
@@ -39,12 +39,12 @@ export default function AwardPanel({ guys, onFile, undoAvailable, onUndo }) {
     }
   };
 
-  if (guys.length === 0) {
+  if (friends.length === 0) {
     return (
       <section aria-label="File a report">
         <h2 className="section-title">File a report</h2>
         <p className="empty-state">
-          The Bureau has no citizens on record. Add some guys first (Bureau Stats → Roster).
+          The Bureau has no citizens on record. Add some friends first (Bureau Stats → Roster).
         </p>
       </section>
     );
@@ -57,16 +57,16 @@ export default function AwardPanel({ guys, onFile, undoAvailable, onUndo }) {
         <div className="field">
           <span className="field-label">Citizen</span>
           <div className="chip-grid" role="radiogroup" aria-label="Citizen">
-            {guys.map((g) => (
+            {friends.map((f) => (
               <button
-                key={g.id}
+                key={f.id}
                 type="button"
                 role="radio"
-                aria-checked={guyId === g.id}
-                className={`chip ${guyId === g.id ? 'selected' : ''}`}
-                onClick={() => { setGuyId(g.id); setError(''); }}
+                aria-checked={friendId === f.id}
+                className={`chip ${friendId === f.id ? 'selected' : ''}`}
+                onClick={() => { setFriendId(f.id); setError(''); }}
               >
-                {g.name}
+                {f.name}
               </button>
             ))}
           </div>

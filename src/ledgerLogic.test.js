@@ -14,14 +14,14 @@ import {
   todayStr,
 } from './ledgerLogic.js';
 
-function guy(overrides = {}) {
+function friend(overrides = {}) {
   return { id: overrides.id || Math.random().toString(16).slice(2), name: 'Dave', ...overrides };
 }
 
 function txn(overrides = {}) {
   return {
     id: Math.random().toString(16).slice(2),
-    guyId: 'g1',
+    friendId: 'f1',
     categoryId: 'snacks',
     delta: 5,
     note: null,
@@ -50,7 +50,7 @@ describe('rank tiers', () => {
   it('maps scores to the correct tier', () => {
     expect(scoreToRank(850).id).toBe('legend');
     expect(scoreToRank(800).id).toBe('legend');
-    expect(scoreToRank(799).id).toBe('good-guy');
+    expect(scoreToRank(799).id).toBe('good-friend');
     expect(scoreToRank(700).id).toBe('solid');
     expect(scoreToRank(600).id).toBe('flake');
     expect(scoreToRank(300).id).toBe('pariah');
@@ -86,57 +86,68 @@ describe('category catalog', () => {
       }
     }
   });
+
+  it('uses neutral wording with no gendered terms', () => {
+    const gendered = /\b(guy|guys|bro|bros|dude|dudes|him|his|he\b)\b/i;
+    for (const c of CREDIT_CATEGORIES) {
+      expect(c.label).not.toMatch(gendered);
+    }
+    for (const r of RANKS) {
+      expect(r.title).not.toMatch(gendered);
+      expect(r.tagline).not.toMatch(gendered);
+    }
+  });
 });
 
 describe('computeScores', () => {
   it('starts everyone at the base score', () => {
-    const rows = computeScores([guy({ id: 'g1', name: 'Dave' }), guy({ id: 'g2', name: 'Mike' })], []);
+    const rows = computeScores([friend({ id: 'f1', name: 'Dave' }), friend({ id: 'f2', name: 'Mike' })], []);
     expect(rows.map((r) => r.score)).toEqual([BASE_SCORE, BASE_SCORE]);
     expect(rows[0].rank.id).toBe('solid');
   });
 
   it('sums deltas and clamps the total', () => {
     const txns = [
-      txn({ guyId: 'g1', delta: 20 }),
-      txn({ guyId: 'g1', delta: -50 }),
-      txn({ guyId: 'g1', delta: 15 }),
+      txn({ friendId: 'f1', delta: 20 }),
+      txn({ friendId: 'f1', delta: -50 }),
+      txn({ friendId: 'f1', delta: 15 }),
     ];
-    const [row] = computeScores([guy({ id: 'g1' })], txns);
+    const [row] = computeScores([friend({ id: 'f1' })], txns);
     expect(row.net).toBe(-15);
     expect(row.score).toBe(BASE_SCORE - 15);
   });
 
-  it('honors the floor when penalties bury a guy', () => {
-    const txns = [txn({ guyId: 'g1', delta: -500 })];
-    const [row] = computeScores([guy({ id: 'g1' })], txns);
+  it('honors the floor when penalties bury a friend', () => {
+    const txns = [txn({ friendId: 'f1', delta: -500 })];
+    const [row] = computeScores([friend({ id: 'f1' })], txns);
     expect(row.score).toBe(MIN_SCORE);
     expect(row.rank.id).toBe('pariah');
   });
 
-  it('honors the ceiling when a guy ascends', () => {
-    const txns = [txn({ guyId: 'g1', delta: 500 })];
-    const [row] = computeScores([guy({ id: 'g1' })], txns);
+  it('honors the ceiling when a friend ascends', () => {
+    const txns = [txn({ friendId: 'f1', delta: 500 })];
+    const [row] = computeScores([friend({ id: 'f1' })], txns);
     expect(row.score).toBe(MAX_SCORE);
     expect(row.rank.id).toBe('legend');
   });
 
   it('sorts by score descending, ties alphabetical', () => {
-    const guys = [guy({ id: 'z', name: 'Zack' }), guy({ id: 'a', name: 'Adam' }), guy({ id: 'm', name: 'Mike' })];
-    const txns = [txn({ guyId: 'z', delta: 30 }), txn({ guyId: 'a', delta: 30 })];
-    const rows = computeScores(guys, txns);
-    expect(rows.map((r) => r.guy.name)).toEqual(['Adam', 'Zack', 'Mike']);
+    const friends = [friend({ id: 'z', name: 'Zack' }), friend({ id: 'a', name: 'Adam' }), friend({ id: 'm', name: 'Mike' })];
+    const txns = [txn({ friendId: 'z', delta: 30 }), txn({ friendId: 'a', delta: 30 })];
+    const rows = computeScores(friends, txns);
+    expect(rows.map((r) => r.friend.name)).toEqual(['Adam', 'Zack', 'Mike']);
   });
 
-  it('counts awards and penalties per guy', () => {
+  it('counts awards and penalties per friend', () => {
     const txns = [
-      txn({ guyId: 'g1', delta: 5 }),
-      txn({ guyId: 'g1', delta: -10 }),
-      txn({ guyId: 'g1', delta: -5 }),
-      txn({ guyId: 'g2', delta: 5 }),
+      txn({ friendId: 'f1', delta: 5 }),
+      txn({ friendId: 'f1', delta: -10 }),
+      txn({ friendId: 'f1', delta: -5 }),
+      txn({ friendId: 'f2', delta: 5 }),
     ];
-    const rows = computeScores([guy({ id: 'g1', name: 'Dave' }), guy({ id: 'g2', name: 'Mike' })], txns);
-    const dave = rows.find((r) => r.guy.id === 'g1');
-    const mike = rows.find((r) => r.guy.id === 'g2');
+    const rows = computeScores([friend({ id: 'f1', name: 'Dave' }), friend({ id: 'f2', name: 'Mike' })], txns);
+    const dave = rows.find((r) => r.friend.id === 'f1');
+    const mike = rows.find((r) => r.friend.id === 'f2');
     expect(dave.awards).toBe(1);
     expect(dave.penalties).toBe(2);
     expect(mike.txnCount).toBe(1);

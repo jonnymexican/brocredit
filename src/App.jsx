@@ -20,8 +20,8 @@ export default function App() {
   const [slogan, setSlogan] = React.useState(() => PROPAGANDA[0]);
 
   const scores = React.useMemo(
-    () => computeScores(ledger.guys, ledger.transactions),
-    [ledger.guys, ledger.transactions]
+    () => computeScores(ledger.friends, ledger.transactions),
+    [ledger.friends, ledger.transactions]
   );
   const stats = React.useMemo(
     () => computeStats(ledger.transactions),
@@ -38,8 +38,8 @@ export default function App() {
     <div className="app">
       <header className="app-header">
         <div className="crest" aria-hidden="true">🎖️</div>
-        <h1>BroCredit™</h1>
-        <p className="bureau-line">Bureau of Guy Conduct — Est. whenever the guys said so</p>
+        <h1>FriendCredit™</h1>
+        <p className="bureau-line">Bureau of Friend Conduct — Est. whenever the friends said so</p>
       </header>
 
       <p className="propaganda" role="note">{slogan}</p>
@@ -62,7 +62,7 @@ export default function App() {
         {view === 'standings' && (
           <>
             <AwardPanel
-              guys={ledger.guys}
+              friends={ledger.friends}
               onFile={ledger.fileTransaction}
               undoAvailable={ledger.undoAvailable}
               onUndo={ledger.undoLast}
@@ -74,7 +74,7 @@ export default function App() {
         {view === 'log' && (
           <TransactionLog
             transactions={ledger.transactions}
-            guys={ledger.guys}
+            friends={ledger.friends}
             onDelete={ledger.deleteTransaction}
           />
         )}
@@ -83,11 +83,11 @@ export default function App() {
           <>
             <Stats stats={stats} />
             <Roster
-              guys={ledger.guys}
+              friends={ledger.friends}
               scores={scores}
-              onAdd={ledger.addGuy}
-              onRename={ledger.renameGuy}
-              onRemove={ledger.removeGuy}
+              onAdd={ledger.addFriend}
+              onRename={ledger.renameFriend}
+              onRemove={ledger.removeFriend}
             />
             <section className="danger-zone" aria-label="Danger zone">
               <h2 className="section-title danger-title">Regime change</h2>

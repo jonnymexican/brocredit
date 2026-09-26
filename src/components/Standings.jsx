@@ -29,7 +29,7 @@ export default function Standings({ rows }) {
       <div className="leader-card" aria-label="Current leader">
         <div className="leader-crown" aria-hidden="true">👑</div>
         <div className="leader-info">
-          <div className="leader-name">{top.guy.name}</div>
+          <div className="leader-name">{top.friend.name}</div>
           <div className="leader-meta">
             {top.score} pts — {top.rank.emoji} {top.rank.title}
           </div>
@@ -38,9 +38,9 @@ export default function Standings({ rows }) {
 
       <ol className="standings-list">
         {rest.map((row, i) => (
-          <li key={row.guy.id} className="standing-row">
+          <li key={row.friend.id} className="standing-row">
             <span className="standing-pos">#{i + 2}</span>
-            <span className="standing-name">{row.guy.name}</span>
+            <span className="standing-name">{row.friend.name}</span>
             {rankPill(row.rank)}
             <span className="standing-score">{row.score}</span>
             <span className="standing-net">

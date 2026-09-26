@@ -18,7 +18,7 @@ export default function Stats({ stats }) {
     <section aria-label="Bureau statistics">
       <h2 className="section-title">Bureau stats</h2>
       <p className="hint-line">
-        Every filing strengthens the Guy-republic. Or lands someone on probation.
+        Every filing strengthens the friend-republic. Or lands someone on probation.
       </p>
       {stats.total === 0 ? (
         <p className="empty-state">No filings yet. The Bureau is disappointed but unsurprised.</p>

@@ -1,8 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { clampDelta, todayStr } from './ledgerLogic.js';
 
-const GUYS_KEY = 'brocredit:guys';
-const TXNS_KEY = 'brocredit:transactions';
+const FRIENDS_KEY = 'friendcredit:friends';
+const TXNS_KEY = 'friendcredit:transactions';
+
+// One-time migration from the pre-rename storage keys.
+const LEGACY_FRIENDS_KEY = 'brocredit:guys';
+const LEGACY_TXNS_KEY = 'brocredit:transactions';
 
 function loadList(key) {
   try {
@@ -23,6 +27,37 @@ function persist(key, value) {
   }
 }
 
+/** Rename guyId/personId → friendId in legacy transactions, if any. */
+function migrateTransactions(txns) {
+  return txns.map((t) => {
+    if (Object.prototype.hasOwnProperty.call(t, 'friendId')) return t;
+    const { guyId, personId, ...rest } = t;
+    return { ...rest, friendId: personId ?? guyId };
+  });
+}
+
+function migrateStorage() {
+  try {
+    if (
+      !window.localStorage.getItem(FRIENDS_KEY) &&
+      window.localStorage.getItem(LEGACY_FRIENDS_KEY)
+    ) {
+      window.localStorage.setItem(FRIENDS_KEY, window.localStorage.getItem(LEGACY_FRIENDS_KEY));
+      window.localStorage.removeItem(LEGACY_FRIENDS_KEY);
+    }
+    if (
+      !window.localStorage.getItem(TXNS_KEY) &&
+      window.localStorage.getItem(LEGACY_TXNS_KEY)
+    ) {
+      const legacy = loadList(LEGACY_TXNS_KEY);
+      window.localStorage.setItem(TXNS_KEY, JSON.stringify(migrateTransactions(legacy)));
+      window.localStorage.removeItem(LEGACY_TXNS_KEY);
+    }
+  } catch {
+    // migration is best-effort
+  }
+}
+
 function makeId() {
   return crypto.randomUUID
     ? crypto.randomUUID()
@@ -30,49 +65,53 @@ function makeId() {
 }
 
 export default function useLedger() {
-  const [guys, setGuys] = useState(() => loadList(GUYS_KEY));
-  const [transactions, setTransactions] = useState(() => loadList(TXNS_KEY));
+  migrateStorage();
+
+  const [friends, setFriends] = useState(() => loadList(FRIENDS_KEY));
+  const [transactions, setTransactions] = useState(() =>
+    migrateTransactions(loadList(TXNS_KEY))
+  );
   const undoRef = useRef(null);
   const [undoAvailable, setUndoAvailable] = useState(false);
 
-  useEffect(() => persist(GUYS_KEY, guys), [guys]);
+  useEffect(() => persist(FRIENDS_KEY, friends), [friends]);
   useEffect(() => persist(TXNS_KEY, transactions), [transactions]);
 
-  const addGuy = useCallback((name) => {
+  const addFriend = useCallback((name) => {
     const trimmed = (name || '').trim();
     if (!trimmed) return false;
-    setGuys((current) =>
-      current.some((g) => g.name.toLowerCase() === trimmed.toLowerCase())
+    setFriends((current) =>
+      current.some((f) => f.name.toLowerCase() === trimmed.toLowerCase())
         ? current
         : [...current, { id: makeId(), name: trimmed, createdAt: Date.now() }]
     );
     return true;
   }, []);
 
-  const removeGuy = useCallback((id) => {
-    setGuys((current) => current.filter((g) => g.id !== id));
-    setTransactions((current) => current.filter((t) => t.guyId !== id));
+  const removeFriend = useCallback((id) => {
+    setFriends((current) => current.filter((f) => f.id !== id));
+    setTransactions((current) => current.filter((t) => t.friendId !== id));
   }, []);
 
-  const renameGuy = useCallback((id, name) => {
+  const renameFriend = useCallback((id, name) => {
     const trimmed = (name || '').trim();
     if (!trimmed) return;
-    setGuys((current) => current.map((g) => (g.id === id ? { ...g, name: trimmed } : g)));
+    setFriends((current) => current.map((f) => (f.id === id ? { ...f, name: trimmed } : f)));
   }, []);
 
   /**
    * File a transaction. Returns true when it was recorded. The last filing
    * can be undone (the Bureau is benevolent).
    */
-  const fileTransaction = useCallback(({ guyId, categoryId, delta, note, date }) => {
-    if (!guyId) return false;
+  const fileTransaction = useCallback(({ friendId, categoryId, delta, note, date }) => {
+    if (!friendId) return false;
     const isCustom = categoryId === 'custom';
     if (isCustom && !Number.isFinite(Number(delta))) return false;
 
     const finalDelta = isCustom ? clampDelta(delta) : Number(delta);
     const txn = {
       id: makeId(),
-      guyId,
+      friendId,
       categoryId,
       delta: finalDelta,
       note: (note || '').trim() || null,
@@ -98,18 +137,18 @@ export default function useLedger() {
   }, []);
 
   const clearAll = useCallback(() => {
-    setGuys([]);
+    setFriends([]);
     setTransactions([]);
     undoRef.current = null;
     setUndoAvailable(false);
   }, []);
 
   return {
-    guys,
+    friends,
     transactions,
-    addGuy,
-    removeGuy,
-    renameGuy,
+    addFriend,
+    removeFriend,
+    renameFriend,
     fileTransaction,
     deleteTransaction,
     undoLast,
