@@ -5,7 +5,7 @@ export default function AddFriendForm({ onAdd, compact }) {
   const [error, setError] = React.useState('');
 
   const submit = (e) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
     const trimmed = name.trim();
     if (!trimmed) return;
     const ok = onAdd(trimmed);
@@ -17,8 +17,11 @@ export default function AddFriendForm({ onAdd, compact }) {
     setError('');
   };
 
+  // Rendered inside other <form>s, where nested <form> tags get flattened by
+  // the browser — so this must not rely on form submission. A plain container
+  // with an explicit click handler and Enter-key handling is flatten-proof.
   return (
-    <form className={`add-friend-form ${compact ? 'compact' : ''}`} onSubmit={submit}>
+    <div className={`add-friend-form ${compact ? 'compact' : ''}`}>
       <input
         className="form-input"
         type="text"
@@ -26,11 +29,12 @@ export default function AddFriendForm({ onAdd, compact }) {
         aria-label="Add a friend by name"
         value={name}
         onChange={(e) => { setName(e.target.value); setError(''); }}
+        onKeyDown={(e) => { if (e.key === 'Enter') submit(e); }}
       />
-      <button type="submit" className="btn-secondary" disabled={!name.trim()}>
+      <button type="button" className="btn-secondary" disabled={!name.trim()} onClick={submit}>
         + Add friend
       </button>
       {error && <p className="form-error" role="alert">{error}</p>}
-    </form>
+    </div>
   );
 }
