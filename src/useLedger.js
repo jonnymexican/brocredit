@@ -137,6 +137,12 @@ export default function useLedger() {
 
   const deleteTransaction = useCallback((id) => {
     setTransactions((current) => current.filter((t) => t.id !== id));
+    // If the deleted filing is the pending undo target, retire the undo
+    // button instead of leaving it as a silent no-op.
+    if (undoRef.current === id) {
+      undoRef.current = null;
+      setUndoAvailable(false);
+    }
   }, []);
 
   const undoLast = useCallback(() => {
