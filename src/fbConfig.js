@@ -15,6 +15,12 @@ export const FB_APP_ID = '';
 
 export const FB_ENABLED = Boolean(FB_APP_ID);
 
+// Preview hook: visiting any brocredit URL with ?fbDemo=1 activates a
+// clearly-labeled demo profile for that browser session (sessionStorage),
+// so the connect UI can be exercised without a Meta app. Real users never
+// see it — the flag is opt-in per session and nothing touches Facebook.
+export const FB_DEMO_SESSION_KEY = 'friendcredit:fb-demo-session';
+
 // Where Facebook sends the user back to after the login dialog.
 export const FB_REDIRECT_URI = 'https://jonnymexican.github.io/brocredit/';
 

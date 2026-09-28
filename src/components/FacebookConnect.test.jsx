@@ -74,3 +74,24 @@ describe('OAuth plumbing', () => {
     vi.unstubAllGlobals();
   });
 });
+
+describe('demo preview hook (?fbDemo=1)', () => {
+
+  it('activates for the session when ?fbDemo=1 is present', () => {
+    window.history.replaceState(null, '', '/?fbDemo=1');
+    render(<FacebookConnect />);
+    expect(screen.getByRole('button', { name: /demo/i })).toBeTruthy();
+
+    // Click connects the demo profile without touching the network.
+    fireEvent.click(screen.getByRole('button', { name: /demo/i }));
+    expect(loadStoredProfile().demo).toBe(true);
+    expect(loadStoredProfile().name).toBe('Demo Citizen');
+    expect(screen.getByText(/linked as demo citizen/i)).toBeTruthy();
+
+    // Unlink removes the profile; the demo session persists for the tab.
+    fireEvent.click(screen.getByRole('button', { name: /unlink/i }));
+    expect(loadStoredProfile()).toBe(null);
+    expect(window.sessionStorage.getItem('friendcredit:fb-demo-session')).toBe('1');
+    window.history.replaceState(null, '', '/');
+  });
+});

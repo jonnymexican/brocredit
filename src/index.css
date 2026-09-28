@@ -706,3 +706,8 @@ select,
   font-size: 0.9rem;
   opacity: 0.8;
 }
+
+.fb-demo-tag {
+  color: #f0abfc;
+  letter-spacing: 0.06em;
+}
