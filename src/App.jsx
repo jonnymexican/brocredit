@@ -8,6 +8,7 @@ import TransactionLog from './components/TransactionLog.jsx';
 import Stats from './components/Stats.jsx';
 import Roster from './components/Roster.jsx';
 import BackupRestore from './components/BackupRestore.jsx';
+import AppNav from './components/AppNav.jsx';
 
 const VIEWS = [
   { id: 'standings', label: 'Standings' },
@@ -37,6 +38,7 @@ export default function App() {
 
   return (
     <div className="app">
+      <AppNav current="https://jonnymexican.github.io/brocredit/" />
       <header className="app-header">
         <div className="crest" aria-hidden="true">🎖️</div>
         <h1>FriendCredit™</h1>
