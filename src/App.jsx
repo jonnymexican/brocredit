@@ -89,6 +89,7 @@ export default function App() {
             <Stats stats={stats} />
             <Roster
               friends={ledger.friends}
+              scores={scores}
               onAdd={ledger.addFriend}
               onRename={ledger.renameFriend}
               onRemove={ledger.removeFriend}

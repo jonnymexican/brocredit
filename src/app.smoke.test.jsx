@@ -131,12 +131,25 @@ describe('FriendCredit smoke: core flows', () => {
     expect(screen.getByRole('button', { name: /whatsapp/i })).toBeTruthy();
   });
 
-  it('renders the bureau stats, records office and roster', () => {
+  it('renders the bureau stats with citizens present (regression: missing scores prop crashed the app)', () => {
+    seedSam();
+    window.localStorage.setItem(
+      'friendcredit:friends',
+      JSON.stringify([
+        { id: 'sam-1', name: 'Sam', createdAt: Date.now() },
+        { id: 'em-1', name: 'emily', createdAt: Date.now() },
+      ])
+    );
     render(<App />);
     fireEvent.click(screen.getByRole('tab', { name: /bureau stats/i }));
     expect(screen.getByRole('region', { name: /roster/i })).toBeTruthy();
     expect(screen.getByRole('region', { name: /records office/i })).toBeTruthy();
     expect(screen.getByRole('button', { name: /export records/i })).toBeTruthy();
+    // The roster renders each citizen with their score (crashed when the
+    // scores prop was dropped: undefined.find inside friends.map).
+    expect(screen.getByText('Sam')).toBeTruthy();
+    expect(screen.getByText('emily')).toBeTruthy();
+    expect(screen.getAllByText(/\d+ pts · \d+ filings/).length).toBe(2);
     // Facebook connector stays hidden without an App ID.
     expect(document.querySelector('.fb-zone')).toBeTruthy();
     expect(screen.queryByRole('button', { name: /connect with facebook/i })).toBeNull();

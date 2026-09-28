@@ -17,7 +17,7 @@ export default function Roster({ friends, scores, onAdd, onRename, onRemove }) {
     setNewName('');
   };
 
-  const scoreFor = (id) => scores.find((s) => s.friend.id === id);
+  const scoreFor = (id) => scores?.find((s) => s.friend.id === id);
   const nameTaken = friends.some(
     (f) => f.name.toLowerCase() === newName.trim().toLowerCase()
   ) && newName.trim() !== '';
