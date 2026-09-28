@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { buildBragText, shareToFacebook, shareToWhatsApp, shareNative, hasNativeShare } from '../social.js';
 
 function rankPill(rank) {
   return (
@@ -54,6 +55,33 @@ export default function Standings({ rows }) {
         <span className="hint-line">
           Awards {top.awards} · Penalties {top.penalties} — all records final. Appeals cost credibility.
         </span>
+      </div>
+
+      <div className="brag-row" aria-label="Share the standings">
+        <span className="brag-label">Broadcast the verdict:</span>
+        <button
+          type="button"
+          className="brag-btn"
+          onClick={() => shareToFacebook(buildBragText(top))}
+        >
+          📘 Facebook
+        </button>
+        <button
+          type="button"
+          className="brag-btn"
+          onClick={() => shareToWhatsApp(buildBragText(top))}
+        >
+          💬 WhatsApp
+        </button>
+        {hasNativeShare() && (
+          <button
+            type="button"
+            className="brag-btn"
+            onClick={() => shareNative({ title: 'FriendCredit™', text: buildBragText(top) })}
+          >
+            📤 More…
+          </button>
+        )}
       </div>
     </section>
   );

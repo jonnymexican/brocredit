@@ -9,6 +9,7 @@ import Stats from './components/Stats.jsx';
 import Roster from './components/Roster.jsx';
 import BackupRestore from './components/BackupRestore.jsx';
 import AppNav from './components/AppNav.jsx';
+import FacebookConnect from './components/FacebookConnect.jsx';
 
 const VIEWS = [
   { id: 'standings', label: 'Standings' },
@@ -77,8 +78,8 @@ export default function App() {
 
         {view === 'log' && (
           <TransactionLog
-            transactions={ledger.transactions}
             friends={ledger.friends}
+            transactions={ledger.transactions}
             onDelete={ledger.deleteTransaction}
           />
         )}
@@ -88,13 +89,12 @@ export default function App() {
             <Stats stats={stats} />
             <Roster
               friends={ledger.friends}
-              scores={scores}
               onAdd={ledger.addFriend}
               onRename={ledger.renameFriend}
               onRemove={ledger.removeFriend}
             />
             <section className="danger-zone" aria-label="Danger zone">
-              <h2 className="section-title danger-title">Regime change</h2>
+              <h2 className="section-title">Regime change</h2>
               <p className="hint-line">
                 Wipe every citizen and every record. The Bureau denies this ever happened.
               </p>
@@ -110,6 +110,15 @@ export default function App() {
                 stay on this device — keep a copy somewhere safe.
               </p>
               <BackupRestore />
+            </section>
+
+            <section className="fb-zone" aria-label="Facebook connection">
+              <h2 className="section-title">Facebook liaison</h2>
+              <p className="hint-line">
+                Optionally link your Facebook profile to suggest your name and photo when a
+                citizen registers. The connection lives only on this device.
+              </p>
+              <FacebookConnect />
             </section>
           </>
         )}
