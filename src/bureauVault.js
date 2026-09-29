@@ -55,50 +55,67 @@ function normalizeVaultUrl(url) {
 // ---------- merge (pure, unit-tested) ----------
 
 /**
- * Merges two ledger states { friends, transactions }. Result contains the
- * union by id; when both sides hold the same id the newer createdAt wins.
- * Returns { state, changed } — changed is false when remote already covers
- * everything local has (nothing to push back).
+ * Merges two ledger states { friends, transactions, tombstones }.
+ * - Live items: union by id, newest (updatedAt ?? createdAt) wins.
+ * - Tombstones: union by id, newest deletedAt wins; a tombstone kills any
+ *   live item it is at least as new as, so deletions propagate.
+ * Returns { state, changed } — changed=true when local holds anything the
+ * merged result did not already have (i.e. there is something to push).
  */
 export function mergeStates(local, remote) {
-  const pickNewer = (a, b) => ((b.createdAt || 0) > (a.createdAt || 0) ? b : a);
+  const itemTime = (x) => Number(x.updatedAt ?? x.createdAt ?? 0);
+  const pickNewer = (a, b) => (itemTime(b) > itemTime(a) ? b : a);
+
   const union = (localList, remoteList) => {
     const byId = new Map();
-    for (const item of localList) byId.set(item.id, item);
-    for (const item of remoteList) {
+    for (const item of localList || []) byId.set(item.id, item);
+    for (const item of remoteList || []) {
       byId.set(item.id, byId.has(item.id) ? pickNewer(byId.get(item.id), item) : item);
     }
     return byId;
   };
 
-  const friends = union(local.friends || [], remote.friends || []);
-  const transactions = union(local.transactions || [], remote.transactions || []);
+  const friends = union(local.friends, remote.friends);
+  const transactions = union(local.transactions, remote.transactions);
+  const tombstones = union(local.tombstones, remote.tombstones);
 
-  const localCounts = new Set([...(local.friends || []), ...(local.transactions || [])].map((x) => x.id));
-  const mergedIds = new Set([...friends.keys(), ...transactions.keys()]);
-  const remoteHadEverything =
-    localCounts.size === 0 ||
-    [...localCounts].every((id) => mergedIds.has(id) && !isNewerThanRemote(local, remote, id));
+  // Apply tombstones: drop live items the newest tombstone covers.
+  for (const [id, tb] of tombstones) {
+    const tTime = Number(tb.deletedAt || 0);
+    for (const list of [friends, transactions]) {
+      const item = list.get(id);
+      if (item && itemTime(item) <= tTime) list.delete(id);
+    }
+  }
+
+  // "changed" means the merged result holds something the REMOTE lacks or
+  // holds newer than the remote copy — i.e. there is a reason to push back.
+  const remoteById = new Map();
+  for (const x of remote.friends || []) remoteById.set(x.id, x);
+  for (const x of remote.transactions || []) remoteById.set(x.id, x);
+  for (const x of remote.tombstones || []) remoteById.set(x.id, x);
+  const mergedById = new Map();
+  for (const [id, x] of friends) mergedById.set(id, x);
+  for (const [id, x] of transactions) mergedById.set(id, x);
+  for (const [id, x] of tombstones) mergedById.set(id, x);
+
+  let changed = false;
+  for (const [id, mergedItem] of mergedById) {
+    const remoteItem = remoteById.get(id);
+    if (!remoteItem || itemTime(mergedItem) > itemTime(remoteItem)) {
+      changed = true;
+      break;
+    }
+  }
 
   return {
     state: {
       friends: [...friends.values()],
       transactions: [...transactions.values()],
+      tombstones: [...tombstones.values()],
     },
-    changed: !remoteHadEverything,
+    changed,
   };
-}
-
-function isNewerThanRemote(local, remote, id) {
-  // Local item is "newer than remote" when remote lacks it or holds an older copy.
-  const lf = (local.friends || []).find((f) => f.id === id);
-  const lt = (local.transactions || []).find((t) => t.id === id);
-  const item = lf || lt;
-  if (!item) return false;
-  const rf = (remote.friends || []).find((f) => f.id === id);
-  const rt = (remote.transactions || []).find((t) => t.id === id);
-  const remoteItem = rf || rt;
-  return !remoteItem || (item.createdAt || 0) > (remoteItem.createdAt || 0);
 }
 
 // ---------- API ----------

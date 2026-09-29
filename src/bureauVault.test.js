@@ -45,6 +45,20 @@ describe('mergeStates', () => {
     expect(state.friends.length).toBe(2);
   });
 
+  it('tombstones kill older live items and propagate', () => {
+    const local = { friends: [friend('f1', 'Sam', 1000)], transactions: [], tombstones: [{ id: 'f1', deletedAt: 5000 }] };
+    const remote = { friends: [friend('f1', 'Sam', 1000)], transactions: [], tombstones: [] };
+    const { state } = mergeStates(local, remote);
+    expect(state.friends.length).toBe(0);
+    expect(state.tombstones.map((t) => t.id)).toEqual(['f1']);
+    // A newer edit than the tombstone survives it.
+    const revived = mergeStates(
+      { friends: [friend('f1', 'Sam Reborn', 9000)], transactions: [], tombstones: [] },
+      { friends: [], transactions: [], tombstones: [{ id: 'f1', deletedAt: 5000 }] }
+    );
+    expect(revived.state.friends.length).toBe(1);
+  });
+
   it('tolerates missing lists', () => {
     const { state, changed } = mergeStates(
       { friends: [friend('f1')], transactions: [] },

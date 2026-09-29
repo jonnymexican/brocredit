@@ -78,10 +78,12 @@ export default function useLedger() {
   const getLocal = useCallback(() => ({
     friends: friendsRef.current,
     transactions: txnsRef.current,
+    tombstones: tombstonesRef.current,
   }), []);
   const setLocalBoth = useCallback((state) => {
     setFriends(state.friends || []);
     setTransactions(state.transactions || []);
+    if (Array.isArray(state.tombstones)) setTombstones(state.tombstones);
   }, []);
 
   // Initial pull + periodic refresh while a vault is joined.
@@ -188,6 +190,35 @@ export default function useLedger() {
   useEffect(() => {
     txnsRef.current = transactions;
   }, [transactions]);
+
+  // Deletion markers so the vault merge never resurrects removed records.
+  const TOMBSTONES_KEY = 'friendcredit:fb-tombstones';
+  const [tombstones, setTombstones] = useState(() => {
+    try {
+      const raw = window.localStorage.getItem(TOMBSTONES_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  });
+  const tombstonesRef = useRef(tombstones);
+  useEffect(() => {
+    tombstonesRef.current = tombstones;
+    try {
+      window.localStorage.setItem(TOMBSTONES_KEY, JSON.stringify(tombstones));
+    } catch {
+      // ignore
+    }
+  }, [tombstones]);
+
+  const recordTombstones = useCallback((ids) => {
+    const now = Date.now();
+    setTombstones((current) => [
+      ...current.filter((t) => !ids.includes(t.id)),
+      ...ids.map((id) => ({ id, deletedAt: now })),
+    ]);
+  }, []);
   const undoRef = useRef(null);
   const [undoAvailable, setUndoAvailable] = useState(false);
 
@@ -216,6 +247,7 @@ export default function useLedger() {
   const removeFriend = useCallback((id) => {
     setFriends((current) => current.filter((f) => f.id !== id));
     setTransactions((current) => current.filter((t) => t.friendId !== id));
+    recordTombstones([id, ...txnsRef.current.filter((t) => t.friendId === id).map((t) => t.id)]);
     queueVaultPush();
   }, [queueVaultPush]);
 
@@ -254,6 +286,7 @@ export default function useLedger() {
 
   const deleteTransaction = useCallback((id) => {
     setTransactions((current) => current.filter((t) => t.id !== id));
+    recordTombstones([id]);
     queueVaultPush();
     // If the deleted filing is the pending undo target, retire the undo
     // button instead of leaving it as a silent no-op.
@@ -267,12 +300,17 @@ export default function useLedger() {
     const id = undoRef.current;
     if (!id) return;
     setTransactions((current) => current.filter((t) => t.id !== id));
+    recordTombstones([id]);
     undoRef.current = null;
     setUndoAvailable(false);
     queueVaultPush();
   }, [queueVaultPush]);
 
   const clearAll = useCallback(() => {
+    recordTombstones([
+      ...friendsRef.current.map((f) => f.id),
+      ...txnsRef.current.map((t) => t.id),
+    ]);
     setFriends([]);
     setTransactions([]);
     undoRef.current = null;
