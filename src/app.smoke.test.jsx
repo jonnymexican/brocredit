@@ -150,8 +150,10 @@ describe('FriendCredit smoke: core flows', () => {
     expect(screen.getByText('Sam')).toBeTruthy();
     expect(screen.getByText('emily')).toBeTruthy();
     expect(screen.getAllByText(/\d+ pts · \d+ filings/).length).toBe(2);
-    // Facebook connector stays hidden without an App ID.
+    // The real Facebook connector is live: the App ID is configured, so the
+    // connect button renders inside the liaison zone (no DEMO tag).
     expect(document.querySelector('.fb-zone')).toBeTruthy();
-    expect(screen.queryByRole('button', { name: /connect with facebook/i })).toBeNull();
+    const fbBtn = screen.getByRole('button', { name: /connect with facebook/i });
+    expect(fbBtn.textContent).not.toMatch(/demo/i);
   });
 });

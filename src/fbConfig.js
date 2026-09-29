@@ -1,17 +1,18 @@
 // Facebook Login configuration.
 //
-// To enable the "Connect with Facebook" button in FriendCredit:
-//   1. Create an app at https://developers.facebook.com/apps (type: Business)
-//   2. Add the "Facebook Login for Web" product
-//   3. In Settings → Basic, copy the App ID and paste it below
-//   4. Under Facebook Login settings, add
-//      https://jonnymexican.github.io to "Valid OAuth Redirect URIs"
-//   5. Deploy — the button appears automatically once an ID is present.
+// Live Meta app: "FriendCredit Bureau" (type: Business), created at
+// https://developers.facebook.com/apps. Product: Facebook Login for
+// Business — the classic implicit token flow in FacebookConnect.jsx
+// (response_type=token) is used against its OAuth settings.
+//   - Valid OAuth Redirect URI (saved in the dashboard):
+//       https://jonnymexican.github.io/brocredit/
+//   - App Mode is Development: only the owner and anyone listed under
+//     App roles → Testers can complete the login dialog.
 //
 // While APP_ID is empty the connector renders nothing, so the app stays
 // account-free by default.
 
-export const FB_APP_ID = '';
+export const FB_APP_ID = '28507890808863883';
 
 export const FB_ENABLED = Boolean(FB_APP_ID);
 

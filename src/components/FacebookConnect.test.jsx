@@ -11,11 +11,14 @@ import FacebookConnect, {
 import { FB_APP_ID, FB_ENABLED, FB_SCOPES, FB_REDIRECT_URI } from '../fbConfig.js';
 
 describe('FacebookConnect gating', () => {
-  it('renders nothing while no App ID is configured', () => {
-    expect(FB_APP_ID).toBe('');
-    expect(FB_ENABLED).toBe(false);
-    const { container } = render(<FacebookConnect />);
-    expect(container).toBeEmptyDOMElement();
+  it('shows the real connect button once an App ID is configured', () => {
+    expect(typeof FB_APP_ID).toBe('string');
+    expect(FB_APP_ID.length).toBeGreaterThan(0);
+    expect(FB_ENABLED).toBe(true);
+    render(<FacebookConnect />);
+    const btn = screen.getByRole('button', { name: /connect with facebook/i });
+    expect(btn).toBeTruthy();
+    expect(btn.textContent).not.toMatch(/demo/i);
   });
 });
 
