@@ -129,7 +129,10 @@ export default function App() {
       </main>
 
       <footer className="app-footer">
-        All records stay on this device. The Bureau never leaks. Probably.
+        All records stay on this device. The Bureau never leaks. Probably.{' '}
+        <a className="app-footer-link" href="./privacy.html">Privacy</a>
+        {' · '}
+        <a className="app-footer-link" href="./data-deletion.html">Data deletion</a>
       </footer>
     </div>
   );
