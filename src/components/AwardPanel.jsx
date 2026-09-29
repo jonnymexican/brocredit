@@ -2,7 +2,7 @@ import * as React from 'react';
 import { CREDIT_CATEGORIES, CUSTOM_CATEGORY_ID, clampDelta, todayStr } from '../ledgerLogic.js';
 import AddFriendForm from './AddFriendForm.jsx';
 
-export default function AwardPanel({ friends, onFile, undoAvailable, onUndo, onAddFriend }) {
+export default function AwardPanel({ friends, onFile, undoAvailable, onUndo, onAddFriend, fbSuggestion }) {
   const [friendId, setFriendId] = React.useState('');
   const [categoryId, setCategoryId] = React.useState('');
   const [customDelta, setCustomDelta] = React.useState('');
@@ -47,7 +47,7 @@ export default function AwardPanel({ friends, onFile, undoAvailable, onUndo, onA
         <p className="empty-state">
           The Bureau has no citizens on record. Register your first friend below — every republic starts somewhere.
         </p>
-        {onAddFriend && <AddFriendForm compact onAdd={onAddFriend} />}
+        {onAddFriend && <AddFriendForm compact onAdd={onAddFriend} fbSuggestion={fbSuggestion} />}
       </section>
     );
   }
@@ -72,7 +72,7 @@ export default function AwardPanel({ friends, onFile, undoAvailable, onUndo, onA
               </button>
             ))}
           </div>
-          {onAddFriend && <AddFriendForm compact onAdd={onAddFriend} />}
+          {onAddFriend && <AddFriendForm compact onAdd={onAddFriend} fbSuggestion={fbSuggestion} />}
         </div>
 
         <div className="field">

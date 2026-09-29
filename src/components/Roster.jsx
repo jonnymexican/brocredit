@@ -1,9 +1,10 @@
 import * as React from 'react';
 
-export default function Roster({ friends, scores, onAdd, onRename, onRemove }) {
+export default function Roster({ friends, scores, onAdd, onRename, onRemove, fbSuggestion }) {
   const [newName, setNewName] = React.useState('');
   const [editingId, setEditingId] = React.useState(null);
   const [editName, setEditName] = React.useState('');
+  const [suggestionDismissed, setSuggestionDismissed] = React.useState(false);
 
   const add = (e) => {
     e.preventDefault();
@@ -28,6 +29,33 @@ export default function Roster({ friends, scores, onAdd, onRename, onRemove }) {
       <p className="hint-line">
         Citizenship is granted upon entry and revoked only by the tribunal (you).
       </p>
+
+      {fbSuggestion && !fbSuggestion.demo && !suggestionDismissed && !newName.trim() && (
+        <div className="fb-suggest-row">
+          <button
+            type="button"
+            className="fb-suggest-chip"
+            aria-label={'Register yourself as ' + fbSuggestion.name}
+            onClick={() => {
+              onAdd(fbSuggestion.name);
+              setSuggestionDismissed(true);
+            }}
+          >
+            {fbSuggestion.picture && (
+              <img className="fb-suggest-avatar" src={fbSuggestion.picture} alt="" width="20" height="20" />
+            )}
+            <span className="fb-suggest-text">Register yourself as {fbSuggestion.name}</span>
+          </button>
+          <button
+            type="button"
+            className="fb-suggest-dismiss"
+            aria-label="Dismiss name suggestion"
+            onClick={() => setSuggestionDismissed(true)}
+          >
+            &times;
+          </button>
+        </div>
+      )}
 
       <form className="roster-form" onSubmit={add}>
         <input

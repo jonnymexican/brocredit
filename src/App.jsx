@@ -9,7 +9,7 @@ import Stats from './components/Stats.jsx';
 import Roster from './components/Roster.jsx';
 import BackupRestore from './components/BackupRestore.jsx';
 import AppNav from './components/AppNav.jsx';
-import FacebookConnect from './components/FacebookConnect.jsx';
+import FacebookConnect, { loadStoredProfile } from './components/FacebookConnect.jsx';
 
 const VIEWS = [
   { id: 'standings', label: 'Standings' },
@@ -21,6 +21,7 @@ export default function App() {
   const ledger = useLedger();
   const [view, setView] = React.useState('standings');
   const [slogan, setSlogan] = React.useState(() => PROPAGANDA[0]);
+  const [fbProfile, setFbProfile] = React.useState(() => loadStoredProfile());
 
   const scores = React.useMemo(
     () => computeScores(ledger.friends, ledger.transactions),
@@ -71,6 +72,7 @@ export default function App() {
               undoAvailable={ledger.undoAvailable}
               onUndo={ledger.undoLast}
               onAddFriend={ledger.addFriend}
+              fbSuggestion={fbProfile && !fbProfile.demo ? fbProfile : null}
             />
             <Standings rows={scores} />
           </>
@@ -93,6 +95,7 @@ export default function App() {
               onAdd={ledger.addFriend}
               onRename={ledger.renameFriend}
               onRemove={ledger.removeFriend}
+              fbSuggestion={fbProfile && !fbProfile.demo ? fbProfile : null}
             />
             <section className="danger-zone" aria-label="Danger zone">
               <h2 className="section-title">Regime change</h2>
@@ -119,7 +122,7 @@ export default function App() {
                 Optionally link your Facebook profile to suggest your name and photo when a
                 citizen registers. The connection lives only on this device.
               </p>
-              <FacebookConnect />
+              <FacebookConnect onProfile={setFbProfile} />
             </section>
           </>
         )}

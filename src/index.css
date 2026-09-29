@@ -711,3 +711,50 @@ select,
   color: #f0abfc;
   letter-spacing: 0.06em;
 }
+
+/* Facebook name+avatar suggestion chip (Add-friend / Register citizen) */
+.fb-suggest-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.fb-suggest-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid rgba(24, 119, 242, 0.6);
+  background: rgba(24, 119, 242, 0.14);
+  color: inherit;
+  border-radius: 999px;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.fb-suggest-chip:hover {
+  background: rgba(24, 119, 242, 0.28);
+}
+
+.fb-suggest-avatar {
+  border-radius: 999px;
+}
+
+.fb-suggest-dismiss {
+  border: none;
+  background: transparent;
+  color: inherit;
+  opacity: 0.55;
+  font-size: 0.85rem;
+  line-height: 1;
+  padding: 0.25rem 0.35rem;
+  cursor: pointer;
+}
+
+.fb-suggest-dismiss:hover {
+  opacity: 1;
+}

@@ -157,3 +157,23 @@ describe('FriendCredit smoke: core flows', () => {
     expect(fbBtn.textContent).not.toMatch(/demo/i);
   });
 });
+
+describe('FriendCredit smoke: Facebook suggestion', () => {
+  it('suggests the linked Facebook profile in the add-friend form', () => {
+    // A device with a linked (non-demo) Facebook profile pre-seeds the chip.
+    window.localStorage.setItem(
+      'friendcredit:fb-profile',
+      JSON.stringify({ name: 'Juanito Pedro Luis Guzman', picture: null, id: '9', demo: false })
+    );
+    seedSam();
+    render(<App />);
+    const chip = screen.getByRole('button', {
+      name: /register yourself as juanito pedro luis guzman/i,
+    });
+    fireEvent.click(chip);
+    // The suggested citizen is registered and visible in the standings…
+    expect(screen.getAllByText('Juanito Pedro Luis Guzman').length).toBeGreaterThan(0);
+    // …and the chip is consumed.
+    expect(screen.queryByRole('button', { name: /register yourself as/i })).toBeNull();
+  });
+});
