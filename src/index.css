@@ -713,6 +713,44 @@ select,
 }
 
 /* Facebook name+avatar suggestion chip (Add-friend / Register citizen) */
+/* Shared vault (sync) section */
+.vault-zone {
+  margin-top: 1.2rem;
+  border: 1px solid rgba(240, 233, 226, 0.12);
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+.vault-form {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.vault-form .form-input {
+  flex: 1 1 12rem;
+}
+
+.vault-status-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  font-size: 0.92rem;
+}
+
+.vault-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #888;
+  display: inline-block;
+}
+
+.vault-ok { background: #35c759; }
+.vault-syncing { background: #f5a623; }
+.vault-error { background: #e5484d; }
+
 .app-footer-link {
   color: #7ab8ff;
   text-decoration: none;

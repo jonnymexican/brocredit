@@ -153,6 +153,9 @@ describe('FriendCredit smoke: core flows', () => {
     // The real Facebook connector is live: the App ID is configured, so the
     // connect button renders inside the liaison zone (no DEMO tag).
     expect(document.querySelector('.fb-zone')).toBeTruthy();
+    // Shared-vault section renders its join form while no vault is joined.
+    expect(document.querySelector('.vault-zone')).toBeTruthy();
+    expect(screen.getByRole('button', { name: /join vault/i })).toBeTruthy();
     const fbBtn = screen.getByRole('button', { name: /connect with facebook/i });
     expect(fbBtn.textContent).not.toMatch(/demo/i);
   });

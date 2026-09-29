@@ -17,6 +17,89 @@ const VIEWS = [
   { id: 'stats', label: 'Bureau Stats' },
 ];
 
+function SharedVaultSection({ ledger }) {
+  const [url, setUrl] = React.useState('');
+  const [code, setCode] = React.useState('');
+  const [busy, setBusy] = React.useState(false);
+  const [error, setError] = React.useState('');
+  const joined = ledger.vaultInfo;
+  const statusLabel = {
+    idle: '',
+    syncing: 'Syncing…',
+    ok: 'Synced',
+    error: `Sync problem (${ledger.vaultError})`,
+  }[ledger.vaultStatus] || '';
+
+  const join = async (e) => {
+    e.preventDefault();
+    setError('');
+    setBusy(true);
+    try {
+      await ledger.joinVault(url, code);
+      setUrl('');
+      setCode('');
+    } catch (err) {
+      const msgs = {
+        network: 'Could not reach the vault URL.',
+        unauthorized: 'Wrong bureau code for that vault.',
+        bad_url: 'The vault URL must start with https://',
+        bad_code: 'Codes are 4-40 letters, digits or dashes.',
+        bad_response: 'That URL is not a bureau vault.',
+      };
+      setError(msgs[err.code] || `Join failed (${err.code})`);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <section className="vault-zone" aria-label="Shared vault">
+      <h2 className="section-title">Shared vault</h2>
+      <p className="hint-line">
+        Optionally sync the ledger across everyone's devices via a tiny worker you
+        administer. Everyone who joins with the same bureau code shares one ledger;
+        without a code, records stay on this device only.
+      </p>
+      {joined ? (
+        <div className="vault-status-row">
+          <span className={`vault-dot vault-${ledger.vaultStatus}`} aria-hidden="true" />
+          <span>
+            Joined <strong>{joined.code}</strong> · {statusLabel}
+          </span>
+          <button type="button" className="btn-secondary btn-small" onClick={ledger.leaveVault}>
+            Leave vault
+          </button>
+        </div>
+      ) : (
+        <form className="vault-form" onSubmit={join}>
+          <input
+            className="form-input"
+            type="url"
+            placeholder="Vault URL (https://…workers.dev)"
+            aria-label="Vault URL"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            required
+          />
+          <input
+            className="form-input"
+            type="text"
+            placeholder="Bureau code"
+            aria-label="Bureau code"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            required
+          />
+          <button type="submit" className="btn-primary" disabled={busy || !url.trim() || !code.trim()}>
+            {busy ? 'Joining…' : 'Join vault'}
+          </button>
+        </form>
+      )}
+      {error && <p className="form-error" role="alert">{error}</p>}
+    </section>
+  );
+}
+
 export default function App() {
   const ledger = useLedger();
   const [view, setView] = React.useState('standings');
@@ -115,6 +198,8 @@ export default function App() {
               </p>
               <BackupRestore />
             </section>
+
+            <SharedVaultSection ledger={ledger} />
 
             <section className="fb-zone" aria-label="Facebook connection">
               <h2 className="section-title">Facebook liaison</h2>
