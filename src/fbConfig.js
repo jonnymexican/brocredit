@@ -1,18 +1,25 @@
 // Facebook Login configuration.
 //
-// Live Meta app: "FriendCredit Bureau" (type: Business), created at
-// https://developers.facebook.com/apps. Product: Facebook Login for
-// Business — the classic implicit token flow in FacebookConnect.jsx
-// (response_type=token) is used against its OAuth settings.
-//   - Valid OAuth Redirect URI (saved in the dashboard):
-//       https://jonnymexican.github.io/brocredit/
-//   - App Mode is Development: only the owner and anyone listed under
-//     App roles → Testers can complete the login dialog.
+// Live Meta app: "FriendCredit Login" (type: Consumer), App ID
+// 1590722445287716, product Facebook Login (classic), with
+//   - Valid OAuth Redirect URI: https://jonnymexican.github.io/brocredit/
+//   - Client OAuth login + Web OAuth login: Yes
+//   - App Mode: Development (owner + App roles → Testers only; flip to
+//     Live in the dashboard to open it to everyone).
+// The classic implicit token flow in FacebookConnect.jsx
+// (response_type=token) talks to this app; standard public_profile
+// access needs no App Review.
+//
+// Note: an earlier app "FriendCredit Bureau" (Business type, ID
+// 28507890808863883) is parked — Business apps only offer "Facebook
+// Login for Business", which requires public_profile at ADVANCED
+// access (App Review + business verification) and rejects the login
+// dialog with "needs at least one supported permission".
 //
 // While APP_ID is empty the connector renders nothing, so the app stays
 // account-free by default.
 
-export const FB_APP_ID = '28507890808863883';
+export const FB_APP_ID = '1590722445287716';
 
 export const FB_ENABLED = Boolean(FB_APP_ID);
 
