@@ -18,22 +18,26 @@ link always travels with the post.
 The hub has an "Invite your friends" section with WhatsApp / Facebook / copy
 links pointing at the hub itself.
 
-## 3. Facebook Login (needs a Meta app ID — currently OFF)
+## 3. Facebook Login (LIVE — Consumer app "FriendCredit Login")
 
-`src/fbConfig.js` has `FB_APP_ID = ''`, so the connector renders nothing.
-To turn it on:
+`src/fbConfig.js` carries `FB_APP_ID = '1590722445287716'` — the Consumer app
+**FriendCredit Login** at <https://developers.facebook.com/apps>. Its
+Facebook Login product has `https://jonnymexican.github.io/brocredit/` saved
+as the Valid OAuth Redirect URI, with Client + Web OAuth login enabled.
 
-1. Create an app at <https://developers.facebook.com/apps> — type **Business**
-   (Consumer works too; Business skips some review friction).
-2. Add the **Facebook Login for Web** product.
-3. Settings → Basic → copy the **App ID** into `FB_APP_ID` in
-   `brocredit/src/fbConfig.js`, commit, push.
-4. Facebook Login → Settings → add `https://jonnymexican.github.io/brocredit/`
-   to **Valid OAuth Redirect URIs**.
-5. Leave the app in **Development mode** — development mode works fine for
-   anyone listed as a **Tester/Developer/Admin** in the app's Roles. Put the
-   app live (requires a privacy policy URL) only if you want strangers to use
-   it too.
+- **App type matters.** A **Business**-type app only gets *Facebook Login for
+  Business*, which requires `public_profile` at ADVANCED access (App Review +
+  business verification) and rejects the dialog with "needs at least one
+  supported permission". Pick **Consumer** for classic Facebook Login —
+  standard `public_profile` needs no review. (The earlier Business app
+  "FriendCredit Bureau", ID 28507890808863883, is parked for this reason.)
+- **Development mode:** works for the app owner plus anyone listed under
+  App roles → Testers. Flip to Live (needs a privacy policy URL) only when
+  strangers should use it.
+- **First login per person:** Facebook shows a GDPR consent screen
+  ("Continue as …") before issuing the token; it's once per account+app.
+- Preview hook: `?fbDemo=1` on any brocredit URL activates the clearly-labeled
+  demo profile for the session without touching Facebook.
 
 ### What Login gives you (and what it deliberately doesn't)
 
