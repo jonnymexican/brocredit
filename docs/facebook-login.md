@@ -32,8 +32,20 @@ as the Valid OAuth Redirect URI, with Client + Web OAuth login enabled.
   standard `public_profile` needs no review. (The earlier Business app
   "FriendCredit Bureau", ID 28507890808863883, is parked for this reason.)
 - **Development mode:** works for the app owner plus anyone listed under
-  App roles → Testers. Flip to Live (needs a privacy policy URL) only when
-  strangers should use it.
+  App roles → Testers. Flip to Live only when strangers should use it.
+
+### Going Live (everything is already prepared)
+
+1. **Privacy policy** — live at
+   <https://jonnymexican.github.io/brocredit/privacy.html> and saved in
+   Settings → Basic.
+2. **Data deletion** — live at
+   <https://jonnymexican.github.io/brocredit/data-deletion.html> ("Data
+   deletion instructions URL"), also saved in Settings → Basic.
+3. **Category** — Social networks & dating (saved).
+4. In the dashboard, flip **App Mode: Development → Live** (top bar switch).
+   No App Review needed: `public_profile` works at standard access for
+   name + photo.
 - **First login per person:** Facebook shows a GDPR consent screen
   ("Continue as …") before issuing the token; it's once per account+app.
 - Preview hook: `?fbDemo=1` on any brocredit URL activates the clearly-labeled
