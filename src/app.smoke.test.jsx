@@ -180,3 +180,46 @@ describe('FriendCredit smoke: Facebook suggestion', () => {
     expect(screen.queryByRole('button', { name: /register yourself as/i })).toBeNull();
   });
 });
+
+describe('FriendCredit smoke: vault invite', () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
+
+  it('joins a vault and shares the bureau code via copy or WhatsApp', async () => {
+    // joinVault creates an unknown bureau: first GET 404s, then PUT succeeds.
+    vi.spyOn(global, 'fetch').mockImplementation(async (_url, opts = {}) => {
+      if (opts.method === 'GET') {
+        return { ok: false, status: 404, json: async () => ({ error: 'unknown_bureau' }) };
+      }
+      if (opts.method === 'PUT') {
+        return { ok: true, status: 200, json: async () => ({ ok: true, v: 1 }) };
+      }
+      return { ok: false, status: 404, json: async () => ({}) };
+    });
+    const writeSpy = vi.fn().mockResolvedValue();
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText: writeSpy }, configurable: true });
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+
+    render(<App />);
+    fireEvent.click(screen.getByRole('tab', { name: /bureau stats/i }));
+    fireEvent.change(screen.getByLabelText('Vault URL'), { target: { value: 'https://vault.example' } });
+    fireEvent.change(screen.getByLabelText('Bureau code'), { target: { value: 'BLUE-HERON-77' } });
+    fireEvent.click(screen.getByRole('button', { name: /join vault/i }));
+
+    // Joined row shows the code, along with the new invite buttons.
+    await waitFor(() => expect(screen.getByText('BLUE-HERON-77')).toBeTruthy());
+    fireEvent.click(screen.getByRole('button', { name: /copy invite/i }));
+    await waitFor(() => expect(screen.getByText(/copied/i)).toBeTruthy());
+    expect(writeSpy.mock.calls[0][0]).toContain('BLUE-HERON-77');
+
+    fireEvent.click(screen.getByRole('button', { name: /whatsapp/i }));
+    expect(openSpy.mock.calls[0][0]).toContain('https://wa.me/?text=');
+    expect(decodeURIComponent(openSpy.mock.calls[0][0])).toContain('BLUE-HERON-77');
+  });
+});

@@ -31,3 +31,24 @@ export async function shareNative({ title, text }) {
 export function hasNativeShare() {
   return typeof navigator.share === 'function';
 }
+
+// ---------- vault invites ----------
+
+/** Invite blurb for a shared-vault bureau code (the code IS the credential). */
+export function buildVaultInviteText(code) {
+  return `🎖️ You're invited to our Bureau of Friend Conduct. Join the shared vault with bureau code ${code}`;
+}
+
+/** Copies "invite text + app link"; returns false when the clipboard is unavailable. */
+export async function copyVaultInvite(code) {
+  try {
+    await navigator.clipboard.writeText(`${buildVaultInviteText(code)} — ${APP_URL}`);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function shareVaultInviteToWhatsApp(code) {
+  openSharePopup(`https://wa.me/?text=${encodeURIComponent(`${buildVaultInviteText(code)} — ${APP_URL}`)}`);
+}

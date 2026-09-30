@@ -1,5 +1,15 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { buildBragText, shareToFacebook, shareToWhatsApp, shareNative, hasNativeShare, APP_URL } from './social';
+import {
+  buildBragText,
+  shareToFacebook,
+  shareToWhatsApp,
+  shareNative,
+  hasNativeShare,
+  buildVaultInviteText,
+  copyVaultInvite,
+  shareVaultInviteToWhatsApp,
+  APP_URL,
+} from './social';
 
 describe('FriendCredit social sharing', () => {
   let openSpy;
@@ -40,5 +50,50 @@ describe('FriendCredit social sharing', () => {
   it('shareNative returns false and does not throw when unsupported', async () => {
     const result = await shareNative({ title: 't', text: 'x' });
     expect(result).toBe(false);
+  });
+});
+
+describe('vault invite sharing', () => {
+  let openSpy;
+  let writeSpy;
+
+  beforeEach(() => {
+    openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+    writeSpy = vi.fn();
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText: writeSpy }, configurable: true });
+  });
+
+  afterEach(() => {
+    openSpy.mockRestore();
+    vi.restoreAllMocks();
+  });
+
+  it('builds an invite line that carries the bureau code', () => {
+    const text = buildVaultInviteText('BLUE-HERON-77');
+    expect(text).toContain('BLUE-HERON-77');
+    expect(text).toContain('Bureau of Friend Conduct');
+  });
+
+  it('copies invite text plus the app link and reports success', async () => {
+    writeSpy.mockResolvedValue();
+    const ok = await copyVaultInvite('BLUE-HERON-77');
+    expect(ok).toBe(true);
+    const written = writeSpy.mock.calls[0][0];
+    expect(written).toContain('BLUE-HERON-77');
+    expect(written).toContain(APP_URL);
+  });
+
+  it('returns false instead of throwing when the clipboard is unavailable', async () => {
+    writeSpy.mockRejectedValue(new Error('denied'));
+    const ok = await copyVaultInvite('BLUE-HERON-77');
+    expect(ok).toBe(false);
+  });
+
+  it('opens WhatsApp with the encoded invite and code', () => {
+    shareVaultInviteToWhatsApp('BLUE-HERON-77');
+    const url = openSpy.mock.calls[0][0];
+    expect(url).toContain('https://wa.me/?text=');
+    expect(url).toContain(encodeURIComponent('BLUE-HERON-77'));
+    expect(url).toContain(encodeURIComponent(APP_URL));
   });
 });

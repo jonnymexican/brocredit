@@ -751,6 +751,14 @@ select,
 .vault-syncing { background: #f5a623; }
 .vault-error { background: #e5484d; }
 
+.vault-invite-btn {
+  margin-left: 0.2rem;
+}
+
+.vault-status-row strong {
+  letter-spacing: 0.04em;
+}
+
 .app-footer-link {
   color: #7ab8ff;
   text-decoration: none;

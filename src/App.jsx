@@ -10,6 +10,7 @@ import Roster from './components/Roster.jsx';
 import BackupRestore from './components/BackupRestore.jsx';
 import AppNav from './components/AppNav.jsx';
 import FacebookConnect, { loadStoredProfile } from './components/FacebookConnect.jsx';
+import { copyVaultInvite, shareVaultInviteToWhatsApp } from './social.js';
 
 const VIEWS = [
   { id: 'standings', label: 'Standings' },
@@ -22,6 +23,7 @@ function SharedVaultSection({ ledger }) {
   const [code, setCode] = React.useState('');
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState('');
+  const [copied, setCopied] = React.useState(false);
   const joined = ledger.vaultInfo;
   const statusLabel = {
     idle: '',
@@ -66,6 +68,23 @@ function SharedVaultSection({ ledger }) {
           <span>
             Joined <strong>{joined.code}</strong> · {statusLabel}
           </span>
+          <button
+            type="button"
+            className="btn-secondary btn-small vault-invite-btn"
+            onClick={async () => {
+              setCopied(await copyVaultInvite(joined.code));
+              setTimeout(() => setCopied(false), 2000);
+            }}
+          >
+            {copied ? '✓ Copied' : 'Copy invite'}
+          </button>
+          <button
+            type="button"
+            className="btn-secondary btn-small vault-invite-btn"
+            onClick={() => shareVaultInviteToWhatsApp(joined.code)}
+          >
+            WhatsApp
+          </button>
           <button type="button" className="btn-secondary btn-small" onClick={ledger.leaveVault}>
             Leave vault
           </button>
